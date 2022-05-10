@@ -80,10 +80,12 @@ def train(datastr, splitstr):
     
     adj = adj.to_dense()
     adj_i = adj_i.to_dense()
-    mask=generate_mask(adj,'random')
-    res=pkl.load(open('chameleon_embed.pkl','rb'))
-    features=torch.mm(features,res)
-    model = GAT(nfeat=features.shape[1], 
+    # mask=generate_mask(adj,'random')
+    # res=pkl.load(open('chameleon_embed.pkl','rb'))
+    # features=torch.mm(features,res)
+    model = GAT(nfeat=features.shape[1],
+                nhid=8, 
+                adj=adj,
                 nclass=int(labels.max()) + 1)
     optimizer = optim.Adam(model.parameters(),
                            lr=args.lr)
@@ -97,7 +99,7 @@ def train(datastr, splitstr):
             model, labels,features, idx_val)
         # Uncomment following lines to see loss and accuracy values
 
-        if(epoch+1) % 10 == 0:
+        if(epoch+1) % 100 == 0:
 
             print('Epoch:{:04d}'.format(epoch+1),
                   'train',
