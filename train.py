@@ -77,23 +77,14 @@ def test_step(model, labels,features, idx_test):
 def train(datastr, splitstr):
     adj, adj_i, features, labels, idx_train, idx_val, idx_test = full_load_data(
         datastr, splitstr)
+    
     adj = adj.to_dense()
     adj_i = adj_i.to_dense()
     mask=generate_mask(adj,'random')
+    res=pkl.load(open('chameleon_embed.pkl','rb'))
+    features=torch.mm(features,res)
     model = GAT(nfeat=features.shape[1], 
-                nhid=args.nhid, 
-                nclass=int(labels.max()) + 1, 
-                dropout=args.dropout, 
-                nheads=args.nb_heads, 
-                alpha=args.alpha
-                ,adj=adj,
-                mask=mask)
-    if args.pretrain:
-        tokenizer=vae(nhid=args.nhid,epochs=7000,lr=0.02)
-        pretrain_class=do_pretrain_job(tokenizer,epochs=2000,nheads=args.nb_heads)
-        pretrain_class(model,features,mask)
-        model.load_state_dict(torch.load("pretrained/prebest.pt"))
-        
+                nclass=int(labels.max()) + 1)
     optimizer = optim.Adam(model.parameters(),
                            lr=args.lr)
 
